@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>淘宝评论爬虫（本地）</title>
+    <style>
+      :root {
+        --bg: #0b1220;
+        --card: rgba(255, 255, 255, 0.06);
+        --card2: rgba(255, 255, 255, 0.08);
+        --text: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.7);
+        --border: rgba(255, 255, 255, 0.12);
+        --accent: #4f8cff;
+        --accent2: #7c5cff;
+        --danger: #ff4f6d;
+        --ok: #3ddc97;
+      }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+        background: radial-gradient(1200px 600px at 20% 10%, rgba(79, 140, 255, 0.35), transparent 55%),
+          radial-gradient(900px 500px at 80% 20%, rgba(124, 92, 255, 0.28), transparent 55%),
+          var(--bg);
+        color: var(--text);
+      }
+      .wrap {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 28px 18px 60px;
+      }
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+      .title {
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+      }
+      .hint {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 14px;
+      }
+      @media (max-width: 860px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .card {
+        background: linear-gradient(180deg, var(--card), rgba(255, 255, 255, 0.03));
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+        backdrop-filter: blur(8px);
+      }
+      label {
+        display: block;
+        font-size: 13px;
+        color: var(--muted);
+        margin: 10px 0 6px;
+      }
+      input, select {
+        width: 100%;
+        box-sizing: border-box;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        color: var(--text);
+        padding: 12px 12px;
+        border-radius: 10px;
+        outline: none;
+      }
+      input:focus, select:focus {
+        border-color: rgba(79, 140, 255, 0.6);
+        box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.2);
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .row > * { flex: 1; }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        padding: 12px 14px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, rgba(79, 140, 255, 0.9), rgba(124, 92, 255, 0.85));
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        user-select: none;
+      }
+      .btn[disabled] {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+      .btn.secondary {
+        background: rgba(255, 255, 255, 0.08);
+        font-weight: 600;
+      }
+      .status {
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        font-size: 12px;
+        margin-left: 8px;
+      }
+      .ok { color: var(--ok); }
+      .bad { color: var(--danger); }
+      a {
+        color: #bcd3ff;
+        text-decoration: none;
+      }
+      a:hover { text-decoration: underline; }
+      .downloads a {
+        display: block;
+        padding: 10px 12px;
+        margin-top: 8px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .small {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 10px;
+      }
+      .steps {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+      code {
+        background: rgba(255,255,255,0.08);
+        padding: 2px 6px;
+        border-radius: 6px;
+        border: 1px solid rgba(255,255,255,0.12);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="header">
+        <div>
+          <div class="title">淘宝评论爬虫（本地界面）</div>
+          <div class="hint">
+            第一次请在弹出的 Edge 里手动登录淘宝一次，之后会自动保持登录态（复用 profile）。
+          </div>
+        </div>
+        <div class="hint">
+          服务状态：<span id="serverPill" class="pill">未检测</span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <label>淘宝商品链接（item.taobao.com）</label>
+          <input id="url" placeholder="粘贴商品链接，例如：https://item.taobao.com/item.htm?id=..." />
+
+          <div class="row" style="margin-top: 10px;">
+            <div>
+              <label>身份（用于后续扩展总结风格）</label>
+              <select id="role">
+                <option value="buyer">买家</option>
+                <option value="seller">卖家</option>
+              </select>
+            </div>
+            <div>
+              <label>操作</label>
+              <button id="startBtn" class="btn">开始爬取</button>
+            </div>
+          </div>
+
+          <label style="margin-top:12px;">
+            <input id="mbert" type="checkbox" style="width:auto; margin-right:8px; transform: translateY(1px);" />
+            生成 mBERT 可视化（会下载模型，首次较慢）
+          </label>
+
+          <div id="status" class="status">等待开始。</div>
+          <div id="summary" class="status" style="display:none; margin-top:10px;"></div>
+          <div id="sentimentChart" style="display:block; margin-top:10px; height:240px; border:1px solid var(--border); border-radius:12px;"></div>
+          <div id="attrChart" style="display:block; margin-top:10px; height:260px; border:1px solid var(--border); border-radius:12px;"></div>
+          <div id="topicChart" style="display:block; margin-top:10px; height:240px; border:1px solid var(--border); border-radius:12px;"></div>
+          <div id="preview" class="status" style="display:none; margin-top:10px; overflow:auto; max-height:260px;"></div>
+          <div class="small">
+            提示：运行过程中会弹出 Edge 窗口模拟滚动与点击，这是正常现象。
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:700; margin-bottom:8px;">结果下载</div>
+          <div class="hint">任务完成后会在这里出现下载链接。</div>
+          <div class="downloads" id="downloads"></div>
+
+          <div style="margin-top:16px; font-weight:700;">可视化</div>
+          <div class="hint">勾选 mBERT 后，完成会出现“查看散点图”。</div>
+          <div id="vizBox" style="margin-top:10px;">
+            <div id="viz" style="width:100%; height:320px; border:1px solid var(--border); border-radius:12px;"></div>
+          </div>
+
+          <div style="margin-top:16px; font-weight:700;">使用步骤</div>
+          <ol class="steps">
+            <li>在 VS Code 终端启动服务：<code>python -m uvicorn app:app --reload</code></li>
+            <li>浏览器打开：<code>http://127.0.0.1:8000</code></li>
+            <li>第一次运行：在弹出的 Edge 里手动登录淘宝</li>
+            <li>输入商品链接并开始爬取</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
+

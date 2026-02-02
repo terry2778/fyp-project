@@ -1,0 +1,216 @@
+=== PARAGRAPHS ===
+P1: HKMU COMP S456F Software System Development Project （2025 Autumn) Interim Report
+P3: Project Title:
+P5: Lightweight AI for Smart Review Analysis
+P7: Cover Page:
+P9: Member1
+P11: Name: YAN Boyang
+P12: HKMU ID:13072520
+P13: Programme of Study: Computer Science
+P16: Member2
+P18: Name: Chen Haotian
+P19: HKMU ID:13032766
+P20: Programme of Study: Internet Technology
+P23: Member3
+P25: Name: Yuen Lun Hin
+P26: HKMU ID:13141381
+P27: Programme of Study: Internet Technology
+P30: Date:2026-01-17
+P31: Supervisor: Dr. Kayley
+P32: Project Title: Lightweight AI for Smart Review Analysis
+P34: Table of Content
+P35: Cover Page
+P36: Abstract
+P37: 1 Introduction
+P38: 1.1 overview
+P39: 1.2 Project Aim
+P40: 1.3 Project Objectives
+P41: 1.4 Value Propositions of this Project
+P42: 2. Lit Review
+P43: 3.1 Preliminary Methodology
+P44: 3.2 Requirements, Supporting Technologies, and Technical Gap
+P45: 3.3 Architecture or High-level System Design
+P46: 3.4 Implementation Issues
+P47: Future Plan
+P48: References
+P49: Appendix A: Progress Report
+P50: Appendix B: Revised Project Plan
+P51: Appendix C: Team Members’ Reports
+P52: C1
+P53: C2
+P54: C3
+P56: Abstract
+P57: Since COVID-19 has increased user-generated reviews in Hong Kong's e-commerce sector, the role of AI in processing reviews has emerged. However, there is a significant gap in developing AI instruments meant only for traditional Chinese texts. This leads to the need for creating a project called "Lightweight AI for Smart Review Analysis." The proposed project will take advantage of DrissionPage, mBERT, and MySQL to design this Smart Review Analysis AI that automatically classifies the sentiment of reviews as positive, negative, and neutral, extracts product attribute keywords, builds multidimensional topic models, and presents the results through an easy-to-use interface. The proposed system will provide cost-efficient solutions for small and medium-sized merchants that require massive processing of customer data and transparency for consumers in buying decisions based on feedback free from any bias. This project will have long-term implications for promoting competition based on sustainable development in e-commerce. The data collection, cleaning, and storing processes have been completed, and modeling and AI-based report generation are about to be done.
+P59: Introduction
+P60: 1.1 Overview
+P61: The pandemic, combined with the growth of eCommerce in the post-pandemic era, has led to an increase in user-generated reviews in ALL industries. The reviews play an important role in helping consumers make decisions on purchasing products/services; however, dealing with a lot of user-generated reviews has presented merchants with a great deal of challenges related to managing the volume of reviews and using the reviews to obtain actionable insight. Therefore, it is now essential for merchants to have a review analysis system that is capable of continuously improving their service quality and customer satisfaction based on the insights obtained from reviews.
+P63: Currently, there are few AI models developed specifically for traditional Chinese review analysis within the Hong Kong market. The Hong Kong market lacks artificial intelligence models for analyzing traditional Chinese reviews, for the following reasons:
+P65: Hong Kong uses standard characters (not simplified) and blends unique colloquial terms (e.g., Cantonese loanwords in written form) besides using standard characters. Major differences exist between traditional and simplified Chinese at the level of phrasing and semantics. High-quality annotated datasets for local e-commerce reviews are very rare. This is, in fact, the main barrier to model training since most corpora available use either simplified Chinese or general traditional Chinese texts and not specifically industry focused such as e-commerce feedback.
+P67: Small and medium-sized merchants dominate Hong Kong’s e-commerce ecosystem. Since SMEs do not have ample budgets for custom AI solutions, the commercial incentive for tech providers to develop specialized models is weakened. In simple terms, large-scale monetization cannot be achieved.
+P69: Therefore, there is a need in Hong Kong for intelligent tools to enable the automatic processing of user-generated reviews through technology such as sentiment analysis and topic modeling. The ability to automatically process user-generated reviews will allow merchants and consumers to quickly and easily access key information necessary to make informed decisions regarding the optimization of products/services, and to remain competitive within the market.
+P70: 1.2 Project Aim
+P71: The goal of this project is to create an AI-enabled lightweight Review Analysis Tool that processes and analyzes user reviews for ecommerce automatically. This system will perform Sentiment Analysis to quickly identify user sentiments on the feedback they have posted (whether that feedback is positive, negative or neutral), as well as track other associated measures (such as number of likes).
+P73: The Review Analysis Tool will also allow ecommerce businesses to extract certain keywords regarding product attribute(s) from the reviews (i.e., size, material, price) and will provide a multi-dimensional approach to the analysis of these product attributes through Topic Modelling.
+P75: Ultimately, this review analysis tool will enable businesses to better analyze their customers' needs to enhance and improve their products and/or services. Companies will be better able to provide their customers with the tools necessary for making informed decisions when purchasing products.
+P76: 1.3 Project Objectives
+P77: 1. The mBERT (multilingual BERT) model will be employed for sentiment analysis; it will allow you to retrieve the opinions of consumers automatically from their reviews, and determine if their opinion is either negative, positive, or neutral.
+P79: The mBERT is a language model from Google that came out in 2018. It’s basically BERT but designed to handle multiple languages at once. The idea behind it was to make it easier for computers to understand and work with different languages without needing a separate model for each one. So, when you use mBERT, you’re tapping into a tool that’s built to grasp meanings across languages and can also handle tasks in just one language pretty well.
+P81: For multilingual reviews related to the Hong Kong region (such as Cantonese, English, and Mandarin), mBERT can perform cross-language sentiment classification and topic modeling directly without additional adaptation. The model's automated text analysis capabilities can be combined with a visualization interface to quickly produce structured insights from the reviews.
+P84: 2. Using models like mBERT, RoBERTa, DistilmBERT, topic modeling will provide the ability to analyze the opinions of consumers and identify topics that are present within their reviews. It will classify the opinions of consumers based on their sentiment (positive, negative, neutral), the number of comments, and the number of likes.
+P86: The mBERT works on cross-lingual texts of reviews written in 104 languages. It achieved 89-93% sentiment accuracy in reviews written in English/Standard Chinese and 82-86% in reviews written in Cantonese. mBERT's low-cost deployment and adaptability features efficiently perform automated text mining reviews.
+P88: RoBERTa works on cross-lingual texts of reviews as well and attained 92-95% sentiment accuracy in reviews written in English/Standard Chinese and 86-90% in reviews written in Cantonese. It achieved a 3-5% increase in topic F1 score in reviews written in all languages compared to mBERT.
+P90: DistilmBERT classifies reviews using the mBERT model and attained 87-91% sentiment analysis accuracy in reviews written in English/Standard Chinese and 80-84% in reviews written in Cantonese. It is 60% faster and performs analysis with 40% fewer parameters, which gives it the capacity to perform real-time analysis of reviews, especially in scenarios with low-computation deployment.
+P94: 3. A user-friendly visual interface will be used to present to the users the results of their analyses using charts and structured data. The visual interface will allow users to easily see what the key feedback from their reviews was, helping them to make informed decisions based on their data.
+P95: 1.4 Value Propositions of this Project
+P96: This project offers huge benefits to the online marketplace while influencing the future of e-commerce by providing the following key areas of value:
+P98: 1.4.1 Time Savings for Merchants
+P100: Through using cutting-edge AI analytic tools to analyze large amounts of customer feedback and reviews of products, merchants will save significant amounts of time during the input of data into their systems. Real-time analytics allow merchants to make faster decisions, meet consumer demands promptly, provide optimal products and/or services to their customers, and ultimately allow the merchant to direct their attention away from repetitive labor-intensive activities (data entry) and towards developing their strategic advantage in the marketplace through increased flexibility and operational efficiency.
+P102: 1.4.2 Assist Consumers in Making Purchasing Decisions
+P104: The analyzed data allows consumers to see the performance of products and levels of satisfaction of other customers with their purchases, thus helping consumers make informed decisions when choosing a product. It will allow consumers to determine if a given product is worth its price, enhance the overall experience of buying products online, and provide consumers with more confidence at the point of purchase, thereby increasing customer satisfaction and loyalty.
+P106: 1.4.3 An Innovative Lightweight AI Approach to E-Commerce Review Processing
+P108: This project is unique in that it creates and implements a lightweight artificial intelligence (AI) system specifically designed for e-commerce review processing as opposed to the traditional heavyweight AI applications available today. It provides a double innovation: First, the reduction of complexity involved in reviewing product reviews, and second, giving all merchants (particularly smaller and medium-sized merchants) the tools to take advantage of the same level of analysis provided by extensive data analytic systems. The result is that greater opportunities for competition will exist for smaller merchants.
+P110: 1.4.4 Data-Driven Marketing and Sustainable Product Optimization
+P111: 
+Leveraging real-time customer reviews and preference data, merchants can develop more targeted marketing strategies and optimize their product offerings. Data-driven marketing initiatives may help improve customer engagement and retention rates, while a customer-centric product development approach could reduce unnecessary waste.
+P113: Literature Review
+P115: The rise of e-commerce as a shopping channel began around 2010 with the widespread adoption of various electronic payment methods. It then rapidly expanded across various sectors (from books and electronics to clothing, home appliances, and almost all categories, resulting in a significant increase in online retail sales). By around 2020, with the popularity of smartphones, e-commerce developed into a dominant trend. The emergence of artificial intelligence brought even more possibilities to e-commerce, prompting us to explore whether it can be integrated with AI models for better development. In this context, Shang Yuli (2024) proposed a rather clear overall framework that combines the collection of reviews from e-commerce platforms with model analysis and classification, particularly highlighting the value of topic modeling after sentiment analysis. "However, we are not merely imitating the overall structure; instead, we have introduced certain innovations. First, the web scraping tool used in this case relies on a third-party desktop application that requires users to download and install it. We aimed to find a web scraping tool that can be implemented directly in Python code, making the scraping process more flexible and integrated, achieving an end-to-end solution. Additionally, we added a final step: allowing the LLM model to assist users in automatically generating a report and a chart. This means that after loading the sentiment analysis, the large language model will visualize the data. As a result, regardless of the user's role, they can obtain richer and more valuable information through our final report and chart."
+P118: "Following this framework, as I just mentioned, we have adopted a similar structure. Therefore, we will also look at the processes of other similar cases and the tools they used. By referencing these, we can decide whether to improve based on the solutions in the cases or find excellent examples to learn from. I found that the earliest use of Scrapy for static web scraping has its advantages in simplicity but is almost limited to static web pages. It struggles with modern e-commerce platforms like Taobao that use JavaScript for dynamic rendering, which can easily trigger anti-scraping mechanisms, leading to data acquisition failures. To address this issue, Lu Chengyi et al. (2023) researched using headless browsers (like Selenium) to simulate user actions for scraping e-commerce reviews, which is already considered an excellent scraping method. However, through my research, I discovered a new domestic scraping tool called DrissionPage. This tool is powerful, simple, and flexible, which is exactly what we need. Yet, due to its novelty, it is challenging to find existing cases that use it. Therefore, we will manually write the scraping code, and DrissionPage has passed testing with outstanding performance. Thus, we have confirmed the use of this part of the technology stack for scraping."
+P121: As for the preprocessing of crawled data, since we will also need to conduct sentiment analysis later, clear word segmentation is an essential foundation, laying the groundwork for the subsequent analysis. This structure, where we preprocess first and then perform sentiment analysis, was also researched through some case studies that included both processes. Yang Lihua (2023) first used jieba word segmentation for data preprocessing, then compared SnowNLP with BosonNLP for sentiment analysis, finding that SnowNLP had the advantage of clearer scoring, with a simple process and short time consumption. However, the downside was the lack of distinction between positive and negative emotions, which made it less intuitive. One of the advantages of BosonNLP's sentiment analysis method is its larger score range and ability to differentiate between positive and negative emotions, but it takes longer. Although BosonNLP provides more intuitive results, SnowNLP's scoring accuracy is superior to BosonNLP's when considering accuracy. However, Lu Chengyi et al. (2023) also preprocessed the data first through Jieba word segmentation, then expanded the dictionary of the Word2Vec word vector model using the dictionary expansion method. They extended the traditional sentiment lexicons (such as CNKI HowNet, Taiwan University NTUSD, BosonNLP Sentiment Lexicon). We found that, regardless of the rich tools and methods they later used, both Lu Chengyi et al. (2023) and Yang Lihua (2023) used Jieba word segmentation. Therefore, for us, this is a very useful word segmentation tool to reference. In the sentiment analysis phase, we observed that no tools other than Chinese sentiment analysis were mentioned in the cases we researched. This is because I noticed a certain angle missing, as almost no one is analyzing users from the Hong Kong, Macau, and Taiwan regions, where the predominant language is still Chinese. Due to the need to align with mainland e-commerce platforms, simplified Chinese may be used, or traditional Chinese may be retained, but considering that users in these regions still largely use Chinese, we focused on tools that perform excellently in Chinese.
+P124: Similarly, although we have our areas of focus, it does not mean we overlook or ignore the English components. Therefore, the various tools and dictionaries used for natural language processing in Chinese are clearly not the most suitable choices. Through our investigation, we aim to achieve this through modeling. For the sentiment analysis part, according to my research, L. Davoodi (2025) used LSTM and also chose models such as BERT, XLNet, DistilBERT, and RoBERT for sentiment analysis. Likewise, An Jing (2025) and Liu Bingyang (2025) both selected the BERT model for sentiment analysis. Additionally, Shen Lili's (2022) study on the automatic classification of Chinese journal literature based on the BERT model demonstrated its capabilities in a Chinese context. L. Davoodi's (2025) application also confirms its effectiveness in English contexts. Thus, I found that BERT is currently one of the more mainstream models for sentiment analysis, and L. Davoodi's (2025) research serves as a timely reminder. Furthermore, he also introduced DistilBERT, confirming its potential. By reducing the size of the BERT model by 40%, it is still able to maintain 97% of its language understanding capability, with a 60% performance improvement. This is valuable information for us. In conclusion, we plan to adopt a BERT-based pre-trained model and, inspired by L. Davoodi (2025), we will use a comparative approach between multiple models to determine which one to use moving forward, such as RoBERTa, DistilBERT, DistilmBERT, MBERT, etc. "Soon after, we found that Liu Bingyang (2025), Shang Yuli (2024), and Yang Lihua (2023) all utilized the LDA topic model. Although not highly precise, it remains a model tool that allows users to intuitively understand the emotional tendencies of product reviews. As our research deepened, we discovered that the LDA model acts merely as a statistician. The latest direction of development is deep learning topic models. D. Murthy (2024) employed the BERTtopic model to classify tweets related to electronic cigarettes, yielding very accurate results. Meanwhile, Li Ma directly compared the applications of LDA and BERTtopic in analyzing cardiovascular risks related to female opioid use. The results indicated that the clusters created from BERTopic were more compact and well-separated, representing improved coherence and distinctiveness between the topics, which is highly valuable for reference."
+P127: From the emergence of GPT-1 in 2018, there has been rapid development of large language models, such as GPT-4, which is the leading comprehensive capability, Wei-Qing Li et al. (2025) developed a consumer values scoring robot based on GPT-4 in "Study of Post-Hoc Interpretive Recommendation Models Based on Generative Artificial Intelligence," which directly uses LLM for fine-grained analysis of e-commerce reviews, open-source model benchmarks Llama 3, Claude 3 with outstanding long context capability, and GLM-4 which is deeply optimized in Chinese scenarios, as well as the well-known Gemini 2.0, Deepseek, and Doubao which is used by almost everyone in China, Bloomberg GPT trained specifically for the financial sector for financial news summarization, sentiment analysis, and risk assessment, and Google Med-PaLM 2: an expert at the medical Q&A exam to reach the expert level, Jasper.ai: the use of LLM to help companies with marketing content creation, and so on a large number of excellent cases, and these cases fully proved the feasibility of LLM to directly analyze the comments, for this project to use LLM for comment analysis provides a solid theoretical and methodological basis, the same we will take more than one between the comparison of multiple LLM models, and choose the most appropriate results. the most suitable one.
+P130: Based on an in-depth analysis of the limitations of existing solutions in the literature, this project proposes a similar architecture. To put it simply, we focus on targeted improvements in the following areas:
+P131: "First, regarding the optimization of web scraping, this project uses DrissionPage as the data collection tool. Unlike the Octoparse scraper employed by Shang Yuli (2024), which is a powerful desktop application for web scraping, DrissionPage is a new domestic tool that can be used within Python, offering greater flexibility in writing scraping code. Additionally, compared to the Selenium solution utilized by Lu Chengyi et al. (2023), DrissionPage significantly enhances collection efficiency while maintaining the capability to retrieve dynamic content, better meeting the demand for efficient and stable data collection. Furthermore, the case study overlooks user privacy protection; for sensitive information such as real names or addresses that may appear, we choose to delete it using LLM before storing it in a MySQL database." Moreover, we have some innovative designs in our sentiment analysis model. Based on existing cases, we added the step of generating reports and visual data through LLMs for users in any role. However, through case studies, we also realized that even with pre-trained models, understanding linguistic phenomena may not be as effective as commercial review analysis models. Due to time and resource limitations, real-time large-scale concurrent processing is not feasible. However, we have enabled users to selectively access the latest information to make up for this shortcoming. As a Chinese proverb goes, 'Although the sparrow is small, it has all the vital organs.' Our project has achieved a good balance between limited computing power and practicality, making it especially suitable for small and medium-sized e-commerce application scenarios.
+P133: Methodology
+P134: 3.1 Functional Requirement
+P135: Designated Product Review Analysis
+P136: Product page input box
+P137: It allows users to analyze designated product review
+P138: Analysis button
+P139: Identities selection box
+P140: It allows users to select the appropriate identities so the result of summary will be more customized
+P141: Result Visualization
+P142: It generates visualized chart for user to have a quick understanding of labels of the product reviews
+P143: Large Language Model (LLM) Result Summary
+P144: It allows users to have ideas of pros and cons of the product
+P145: 3.2 Non-functional Requirement
+P146: Performance
+P147: Maintainability
+P148: User-friendly GUI
+P150: 3.3 Supporting Technology
+P151: Data Collection: Python tools like DrissionPage could be used for web scraping due to its simpler API for quick development.
+P152: Data Processing: Regex, Jieba for word extraction and segmentation
+P153: Data Storage: MySQL could be the reliable data storage technique
+P154: NLP Model Development: PyTorch for model building and training
+P155: API Encapsulation: FastAPI is the python framework provides API service
+P157: 3.4 Technical Gap
+P158: The individually built model could be trained with public data while the data quantity, quality and diversity are inferior than the data accessed by the commercial model. The scale of the individual model is smaller than the commercial model.
+P160: 3.5 Architecture or High-level System Design
+P161: Data Collection
+P162: Technology: DrissionPage, Python
+P163: Process: Using DrissionPage in Python as core technology, it will simulate human operation. This mechanism allows the application to bypass the anti-scraping from Taobao, Jingdong through simulating the login operation. In the process, a browser instance is launched with ChormiumPage() and a designated product page will be entered by using get(‘designated URL’). Then use wait.ele_loaded() to wait for page resources loaded. Once the elements are loaded completely, functions like eles() could be used to locate the reviews. Data like user ids, text reviews, ratings, and dates will be extracted and stored in a raw review database.
+P165: Data Preprocessing
+P166: Technology: Regular Expression, Jieba, LLM (e.g., GPT, Claude, Grok)
+P167: Process: In this process, noise such as irrelevant punctuation, special symbols, HTML tags, and extra whitespace is removed using Regex. Then, Jieba is utilized for precise Chinese word segmentation, while NLTK handles tokenization and stemming for English text. To ensure privacy protection, sensitive private information such as personal names, addresses, and phone numbers is identified and filtered out using the LLM's named entity recognition capabilities, as the raw dataset could unintentionally leak such details. The cleaned and tokenized results are then stored in a processed review database.
+P170: Data Storage
+P171: Technology: MySQL
+P172: Process: Three databases will be involved in the system for data storage which are raw review, processed review, and analysis results.
+P174: Sentiment Analysis
+P175: Technology: PyTorch, Pre-trained Models (e.g., RoBERTa, DistilmBERT, mBERT)
+P176: Process: In this process, pre-trained models such as RoBERTa, DistilBERT, and mBERT are invoked. These models are fine-tuned using relevant public datasets related to product commentary (e.g., consumer electronics reviews). This fine-tuning process adapts the general language understanding of the pre-trained models to the specific domain and task of our system, improving accuracy in identifying subtle sentiments. The outputs of the trained model include category review (such as battery, imaging), sentiment tendency (Positive, negative, neutral), and sentiment score. The analyzed results will be stored for further aggregation and visualization.
+P178: Text Summarization
+P179: Technology: LLM, Python
+P180: Process: This module calls an external LLM API, feeding it the aggregated and analyzed results from the database. These LLM-generated summaries and recommendations constitute the Result Summary function, providing insightful conclusions from the large volume of reviews.
+P182: User Interface
+P183: Technology: Web dashboard (HTML, JS, etc.)
+P184: Process: In order to present the result to users, an interactive web dashboard is built. It features with several functions: an input box for users to submit a designated product page URL; a selection box for users to specify their role whether the user is buyer or seller; an analysis button to trigger sentiment analysis and text summarization processes. The dashboard then dynamically displays the result using various graphic charts and presents text-based summarization and suggestion.
+P185: 3.6 Implementation Issues
+P186: Initially, due to the difficulty of scraping comments from dynamic web pages, we frequently encountered issues where comments couldn't be scraped or incorrect information was retrieved. We considered switching our tech stack and adopting Shang Yuli's (2024) approach using Octopus Web Scraper. However, we ultimately deemed this solution impractical. We still need to optimize our manually written code for scraping to ensure the integrity and flexibility of our entire project.
+P187: Future Plan
+P189: For both the ongoing pre-training model phase and the future plan to generate reports and visualize data using large language models (LLMs), we intend to compare multiple models. We also plan to leverage GPT-4 to analyze the effectiveness of pre-trained models and determine which one to adopt. Regarding data visualization, we aim to achieve results similar to or even better than the clarity demonstrated in the figure below.
+P192: References
+P193: Lu Chengyi et al. Research on the Application of E-commerce Platform Reviews Based on Sentiment Analysis [J]. Science and Technology Entrepreneurship Monthly, 2023, 36(10): 150-154.
+P195: Yang Lihua, Li Xinyang, Xu Siyu, Yan Shuai, Chen Zemin. Research on Sentiment Analysis of Ceramic E-commerce Product Reviews [J]. Software Engineering and Applications, 2023, 12(6): 989-1000
+P197: Shang Yuli. Text Mining-Based Analysis of E-commerce Product User Reviews—A Case Study of Xiaomi 14[J]. E-Commerce Review, 2024, 13(4): 5698-5707.
+P199: Li Weiqing et al. Research on Post-hoc Interpretative Recommendation Models Based on Generative Artificial Intelligence [J]. Journal of Information Science, 2025, 44(9): 1114-1127
+P201: Shen Lili, Jiang Peng, Wang Jing. A Practical Study on Automatic Classification of Chinese Journal Literature Based on the BERT Model [J]. Library Journal, 2022, 41(5): 109-118.
+P203: Liu Bingyang, Li Chao, General Gao. Sentiment Analysis of E-commerce Reviews Based on Deep Learning [J]. E-commerce Review, 2025, 14(11): 217-227
+P205: D. Murthy et al. Emerging Trends in Drugs, Addictions, and Health 4 (2024) 100160
+P207: Li Ma et al. 10.3389/ebm.2025.10389
+P209: L. Davoodi et al.Electronic Commerce Research (2025)https://doi.org/10.1007/s10660-025-09948-4
+P211: An Jing, Yang Yunqian, Xiang Ziyue, Yang Yujie. Research on Consumer Online Reviews Based on Information Foraging Theory [J]. E-Commerce Review, 2025, 14(9):57-68. DOI: 10.12677/ecl.2025.1492884
+P212: Appendix A: Progress Report
+P213: Tasks completed (completed literature review, determined the majority of the technology stack, designed the system architecture, wrote partial crawler code, built the database, and performed data cleaning and storage)
+P215: Ongoing tasks (optimizing and refining crawling code segments, attempting fine-tuning of the mBERT model, developing the front-end interface)
+P216: Appendix B: Revised Project Plan
+P218: Appendix C: Team Members’ Interim Reports
+P219: C1: Team Member ’s Interim Report
+P220: Information
+P221: Student Name: Yan Boyang
+P222: HKMU ID:13072520
+P223: Project Title: Lightweight AI for Smart Review Analysis
+P224: Supervisor’s Name: Dr. Kayley
+P225: Date of Report:2026-01-17
+P227: Tasks Assigned to the Author and their Status
+P228: Task1:
+P229: Determine the target data fields: Clearly identify the content to be scraped, such as comment content, user nickname, rating, comment time, follow-up comment flag, product specifications, number of likes, etc.
+P231: Task2:
+P232: Analyze the data source: Taobao comments are mostly dynamically loaded (JSON data returned via AJAX). You need to use browser developer tools to capture the request parameters of the comment interface (such as product ID, page number, etc.).
+P234: Task3:
+P235: Preliminary storage: To avoid data loss in case of scraping interruptions, save the data to a local file or database while scraping.
+P236: Key Successes and Failures by the Author
+P237: C.1Key Successes
+P238: Successfully obtained and saved the data, and I am also very satisfied with the form of the data obtained, which proves the success of data cleaning.
+P240: C.2 Challenges and Solutions
+P241: Anti-scraping mechanism interception
+P242: Symptoms: Requests are denied, returning 403/503 status codes, IP is blocked, or encountering slider CAPTCHA / SMS verification.
+P243: Causes: Taobao has strict anti-scraping policies; interception is triggered when high-frequency requests, non-browser request headers, or continuous access from a single IP are detected.
+P244: Countermeasures: Set request intervals, simulate real browser request headers (including User-Agent and Cookie), manually or automatically handle CAPTCHAs.
+P246: Login Restrictions
+P247: Manifestation: Additional reviews and negative reviews for some products require logging in to a Taobao account to view. Without logging in, only a few public comments can be seen.
+P248: Solution: Use Selenium to simulate login (save cookies), and be careful to avoid frequent operations after logging in; however, note that simulated login may violate Taobao's user agreement.
+P249: C2:Team Member‘s Interim Report
+P250: Information
+P251: Student Name：Chen Haotian
+P252: HKMU ID:13032766
+P253: Project Title: Lightweight AI for Smart Review Analysis
+P254: Supervisor‘s Name:Dr. Kayley
+P255: Date of Report:2026-01-17
+P257: Tasks Assigned to the Author and their Status
+P258: Task1:Data Collection Module Development: Responsible for writing web crawler code using DrissonPage to collect product review data from target e-commerce platforms.
+P260: Status:The core crawler script has been successfully implemented, enabling stable retrieval of comment text, anonymized user names, product models, and comment timestamps from specified product pages.
+P262: Task2:Database Design and Setup: Responsible for designing the MySQL database structure and creating tables to store raw comments, processed comments, and analysis results.
+P264: Status:Three core tables were created: raw_reviews, processed_reviews, and analysis_results.
+P266: Task3:Participate in sentiment analysis model research: Assist in researching and testing the baseline performance of the pre-trained mBERT model for Chinese sentiment analysis.
+P268: Status:The process is still ongoing. Preliminary research on mBert-related articles in the market has been conducted, confirming its functionality.
+P270: Task4:Assist in developing data cleansing and preprocessing modules: Responsible for designing and implementing automated cleansing workflows for review data, including noise removal (symbols, irrelevant text), Chinese word segmentation (using Jieba), text standardization, and leveraging large language model (LLM) APIs to identify and anonymize personal privacy information in reviews (e.g., names, addresses, phone numbers).
+P272: Status:A comprehensive data cleaning pipeline script has been developed, including:
+P273: Regular  expression-based removal of advertisements, special symbols, and meaningless characters;Configuration of the Jieba dictionary to optimize term segmentation for e-commerce terminology (e.g., “free shipping,” “color difference”).The cleaning process has been successfully applied to the initial batch of 1,000 data records, with output samples provided for team evaluation.
+P276: Key Successes and Failures by the Author
+P277: C.1Key Successes
+P278: The web crawler code I developed serves as the cornerstone of the project's data infrastructure. It currently operates stably and has successfully collected over 1,000 initial data points, ensuring reliability for subsequent analysis. Additionally, I implemented three tables within the database structure I designed, clearly delineating each stage of data processing to meet the team's requirements. Through this phase of work, I gained in-depth proficiency in DrissionPage tools and MySQL databases, applying theoretical knowledge to solve practical data acquisition and storage challenges.
+P279: C.2 Challenges and Solutions
+P280: Initially, I tested the robustness and feasibility of the DrissionPage tool. On the Swift Code webpage, I wrote and displayed the scraping code to extract data. Next, I attempted to scrape reviews from the Taobao e-commerce platform, which proved extremely challenging. All comments on Taobao's web pages are dynamic, and the platform employs extensive anti-scraping mechanisms. The initial scraping code frequently failed to retrieve data. My solution was to replace DrissionPage's SessionPage with ChromiumPage, specifically designed for scraping dynamic web pages. I also implemented enhanced time delays to counter anti-scraping measures, simulating how users open pages to view comments. However, newly opened pages still require manual initial login, which remains an area for future optimization.
+P282: Crawling efficiency also poses a significant challenge. To circumvent anti-crawling mechanisms, it's impossible to rapidly scrape all comments in large volumes. Instead, code must simulate user actions to locate comments and replicate scrolling—a highly time-consuming process. Ultimately, I adopted a multi-threaded concurrent crawling approach to maximize scraping efficiency.
+P283: C3:Team Member‘s Interim Report
+P284: Information
+P285: Student Name: Yuen Lun Hin
+P286: HKMU ID: 13141381
+P287: Project Title: Lightweight AI for Smart Review Analysis
+P288: Supervisor ‘s Name: Dr. Kayley
+P289: Date of Report:2026-01-17
+P291: Tasks Assigned to the Author and their Status
+P293: Task: Data Collection
+P295: Status: Successfully acquire product review data from Jingdong and store in csv format using automated scripts based on DrissionPage and Python.
+P297: Task: Data preprocessing
+P299: Status: Implementing Regex to complete simple data cleaning
+P300: Key Successes and Failures by the Author
+P301: C.1Key Successes
+P303: An automatic web scraping program is developed using python to extract review text, rating, date, etc. Successfully collected over 10000 product reviews covering a diverse range of ratings and categories. Basic data preprocessing is adopted to remove  duplicate elements, non-text elements (images, ads).
+P305: C.2 Challenges and Solutions
+P307: Challenge 1: Data contain significant noise like Emoji symbols, mixed Chinese-English text, irregular formatting, and irrelevant promotional content.
+P309: Solution: Using Regex patterns for initial cleanup and planning to employ LLM for cleaning and normalization in the next stage.
+P311: Challenge 2: Data with large volume requires a high performance PC for efficient scraping and local storage management to handle the scale.
+P313: Challenge 3: Major e-commerce platforms like Taobao and Jingdong have implemented anti-scraping mechanisms, including dynamic page loading and behavior verification.
+P315: Solution: Employing strategies such as manual pre-login to establish a valid session before the program starts, and utilizing DrissionPage's capabilities to simulate real person clicking behaviors, random delays, and mouse movements to bypass detection.
+
+=== TABLES ===

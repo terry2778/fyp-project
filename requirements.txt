@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+pydantic
+DrissionPage
+pandas
+openpyxl
+requests
+jieba
+snownlp
+transformers
+torch
+scikit-learn
