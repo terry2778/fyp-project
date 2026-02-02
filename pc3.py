@@ -20,8 +20,6 @@ from data_processor import (
 
 def _ensure_utf8_stdio():
     """
-    Windows 控制台常见默认编码为 GBK，遇到 '❌/✅/📊' 等字符会 print() 直接报错。
-    这里尽量把 stdout/stderr 调整为 utf-8，且用 errors='replace' 保证不崩溃。
     """
     for s in (sys.stdout, sys.stderr):
         try:
@@ -34,7 +32,7 @@ _ensure_utf8_stdio()
 
 def default_output_dir() -> Path:
     desktop_path = Path.home() / "Desktop"
-    data_dir = desktop_path / "淘宝评论_数据库版"
+    data_dir = desktop_path / "淘宝评论"
     data_dir.mkdir(exist_ok=True)
     return data_dir
 
@@ -47,7 +45,7 @@ class DatabaseConnector:
             'port': 3306,
             'user': 'root',
             'password': '',  
-            'database': 'mysql'
+            'database': 'taobao_comments'
         }
         self.connection = None
         
@@ -921,9 +919,9 @@ if __name__ == "__main__":
     DB_CONFIG = {
         'host': 'localhost',
         'port': 3306,
-        'user': 'root',           # 你的MySQL用户名
-        'password': '123456',     # 你的MySQL密码（修改为你自己的密码）
-        'database': 'taobao_comments'  # 你的数据库名
+        'user': 'root', 
+        'password': '',  
+        'database': 'taobao_comments'  
     }
     
     # 默认示例商品链接
