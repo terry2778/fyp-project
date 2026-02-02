@@ -11,9 +11,12 @@ from pathlib import Path
 from datetime import datetime
 from typing import Callable, Optional
 import requests
+import pymysql
 
-from data_processor import process_comments, build_topic_model
-from data_processor import mbert_build_viz
+from data_processor import (
+    process_comments, build_topic_model, mbert_build_viz,
+    connect_to_database, save_raw_to_db, save_processed_to_db, save_analysis_to_db
+)
 
 def _ensure_utf8_stdio():
     """
@@ -31,12 +34,92 @@ _ensure_utf8_stdio()
 
 def default_output_dir() -> Path:
     desktop_path = Path.home() / "Desktop"
-    data_dir = desktop_path / "淘宝评论_最终版"
+    data_dir = desktop_path / "淘宝评论_数据库版"
     data_dir.mkdir(exist_ok=True)
     return data_dir
 
+class DatabaseConnector:
+    """数据库连接管理器"""
+    
+    def __init__(self, db_config: dict = None):
+        self.db_config = db_config or {
+            'host': 'localhost',
+            'port': 3306,
+            'user': 'root',
+            'password': '123456',  # 修改为你的密码
+            'database': 'taobao_comments'
+        }
+        self.connection = None
+        
+        if db_config:
+            self.db_config.update(db_config)
+    
+    def connect(self):
+        """连接到数据库"""
+        try:
+            self.connection = connect_to_database(**self.db_config)
+            return self.connection is not None
+        except Exception as e:
+            print(f"❌ 数据库连接失败: {e}")
+            return False
+    
+    def close(self):
+        """关闭数据库连接"""
+        if self.connection:
+            self.connection.close()
+            print("✅ 数据库连接已关闭")
+    
+    def check_tables(self):
+        """检查表是否存在"""
+        if not self.connection:
+            return False
+        
+        try:
+            with self.connection.cursor() as cursor:
+                cursor.execute("SHOW TABLES")
+                tables = cursor.fetchall()
+                table_names = [list(table.values())[0] for table in tables]
+                
+                required_tables = ['raw_reviews', 'processed_reviews', 'analysis_results']
+                for table in required_tables:
+                    if table in table_names:
+                        print(f"✅ 表 {table} 存在")
+                    else:
+                        print(f"❌ 表 {table} 不存在，请创建该表")
+                        return False
+                return True
+        except Exception as e:
+            print(f"❌ 检查表失败: {e}")
+            return False
+    
+    def save_raw_comments(self, item_id: str, url: str, comments: list[dict], data_source: str = 'browser'):
+        """保存原始评论"""
+        if not self.connection or not comments:
+            return 0
+        
+        # 添加数据来源
+        for comment in comments:
+            comment['data_source'] = data_source
+        
+        return save_raw_to_db(self.connection, item_id, url, comments)
+    
+    def save_processed_comments(self, item_id: str, comments: list[dict]):
+        """保存处理后的评论"""
+        if not self.connection or not comments:
+            return 0
+        
+        return save_processed_to_db(self.connection, item_id, comments)
+    
+    def save_analysis_results(self, item_id: str, comments: list[dict], 
+                            topic_model=None, mbert_viz=None):
+        """保存分析结果"""
+        if not self.connection or not comments:
+            return False
+        
+        return save_analysis_to_db(self.connection, item_id, comments, topic_model, mbert_viz)
+
 class TaobaoCommentCrawler:
-    """淘宝评论爬虫类"""
+    """淘宝评论爬虫类（带数据库支持）"""
     
     def __init__(
         self,
@@ -47,6 +130,7 @@ class TaobaoCommentCrawler:
         keep_login_profile_dir: Optional[Path] = None,
         enable_analysis: bool = True,
         enable_mbert_viz: bool = False,
+        db_config: Optional[dict] = None  # 新增：数据库配置
     ):
         self.target_url = target_url
         self.output_dir = output_dir or default_output_dir()
@@ -59,6 +143,17 @@ class TaobaoCommentCrawler:
         self.enable_analysis = enable_analysis
         self.enable_mbert_viz = enable_mbert_viz
         self.mbert_vis_path = self.output_dir / "mbert_vis.json"
+        
+        # 初始化数据库连接器
+        self.db_connector = DatabaseConnector(db_config)
+        if db_config:
+            if self.db_connector.connect():
+                self.db_connector.check_tables()
+            else:
+                print("⚠️  数据库连接失败，数据将仅保存到本地文件")
+        
+        # 提取商品ID
+        self.item_id = self._extract_item_id()
 
         # DrissionPage 需要能找到浏览器可执行文件；这里优先自动使用本机 Edge
         self.browser = ChromiumPage(self._build_edge_options())
@@ -579,14 +674,22 @@ class TaobaoCommentCrawler:
         
         return ''
     
-    def save_to_excel(self, comments):
-        """保存到Excel"""
+    def save_to_excel_and_db(self, comments):
+        """保存到Excel和数据库"""
         if not comments:
             print("\n[ERROR] 没有评论可保存")
             return False
         
         try:
-            # 清洗、关键词提取、情感分析（可选）
+            # 1. 保存原始数据到数据库
+            if self.db_connector.connection:
+                raw_count = self.db_connector.save_raw_comments(
+                    self.item_id, self.target_url, comments, 'browser'
+                )
+                if raw_count > 0:
+                    print(f"✅ 原始数据已保存到 raw_reviews 表，共 {raw_count} 条")
+            
+            # 2. 清洗、关键词提取、情感分析
             comments = process_comments(comments, enable_analysis=self.enable_analysis)
 
             df = pd.DataFrame(comments)
@@ -595,13 +698,16 @@ class TaobaoCommentCrawler:
             base_cols = ['序号', '用户名', '评论时间', '购买信息', '评论内容']
             extra_cols = ['清洗后评论', '清洗全文', '属性关键词', '关键词', '情感倾向', '情感分数'] if self.enable_analysis else []
 
-            # 主题模型（多主题）— 对所有评论输出主题标签与分布
+            # 3. 主题模型（多主题）
+            topic_model = None
             try:
                 self._status("topic")
                 tm = build_topic_model(comments, text_key="清洗全文", n_topics=6)
                 if tm.doc_topics:
                     df["主题"] = tm.doc_topics
                     df["主题分布"] = tm.doc_topic_scores
+                    topic_model = tm
+                    
                     # 保存主题关键词，便于前端/离线查看
                     (self.output_dir / "topic_model.json").write_text(
                         json.dumps({"topics": tm.topics}, ensure_ascii=False),
@@ -610,11 +716,14 @@ class TaobaoCommentCrawler:
             except Exception as e:
                 print(f"主题模型生成失败：{e}")
 
-            # mBERT 建模 + 可视化坐标（可选）
+            # 4. mBERT 建模 + 可视化坐标（可选）
+            mbert_viz = None
             if self.enable_mbert_viz:
                 try:
                     self._status("mbert")
                     viz = mbert_build_viz(comments)
+                    mbert_viz = viz
+                    
                     # 写入 json（供 web 端可视化）
                     payload = {"meta": viz.meta, "points": viz.points}
                     self.mbert_vis_path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
@@ -628,21 +737,33 @@ class TaobaoCommentCrawler:
                 except Exception as e:
                     print(f"mBERT 可视化生成失败：{e}")
 
+            # 5. 保存处理后的数据到数据库
+            if self.db_connector.connection and self.enable_analysis:
+                processed_count = self.db_connector.save_processed_comments(self.item_id, comments)
+                if processed_count > 0:
+                    print(f"✅ 处理后数据已保存到 processed_reviews 表，共 {processed_count} 条")
+            
+            # 6. 保存分析结果到数据库
+            if self.db_connector.connection and self.enable_analysis:
+                self.db_connector.save_analysis_results(self.item_id, comments, topic_model, mbert_viz)
+            
+            # 7. 设置列顺序并保存到Excel
             column_order = base_cols + extra_cols
             # 如果生成了 mbert 列，就把它们放到最后
             if "mbert_x" in df.columns and "mbert_y" in df.columns:
                 column_order += ["mbert_x", "mbert_y", "cluster"]
             if "主题" in df.columns:
                 column_order += ["主题", "主题分布"]
+            
             df = df[[c for c in column_order if c in df.columns]]
             
-            # 保存到Excel
+            # 8. 保存到Excel
             self._status("saving")
             df.to_excel(self.excel_path, index=False, engine='openpyxl')
             
             print(f"\n[OK] 成功保存 {len(df)} 条评论到: {self.excel_path}")
             
-            # 显示数据预览（含情感分析）
+            # 9. 显示数据预览
             print("\n[PREVIEW] 数据预览:")
             print("=" * 80)
             for _, row in df.head(10).iterrows():
@@ -659,11 +780,11 @@ class TaobaoCommentCrawler:
                     print(f"   关键词: {row['关键词']}")
                 print()
             
-            # 保存为CSV
+            # 10. 保存为CSV
             df.to_csv(self.csv_path, index=False, encoding='utf-8-sig')
             print(f"[FILE] 同时保存为CSV: {self.csv_path}")
 
-            # 情感统计
+            # 11. 情感统计
             if self.enable_analysis and '情感倾向' in df.columns:
                 counts = df['情感倾向'].value_counts()
                 pos = counts.get('正', 0)
@@ -709,11 +830,22 @@ class TaobaoCommentCrawler:
             fast_comments = self.try_fetch_comments_via_api()
             if fast_comments:
                 print(f"\n[FAST] 极速模式获取到 {len(fast_comments)} 条评论，开始保存...")
-                self.save_to_excel(fast_comments)
+                
+                # 保存API获取的数据到数据库
+                if self.db_connector.connection:
+                    self.db_connector.save_raw_comments(
+                        self.item_id, self.target_url, fast_comments, 'api'
+                    )
+                
+                self.save_to_excel_and_db(fast_comments)
                 print(f"\n[DONE] 爬取完成!")
                 print(f"总耗时: {(datetime.now() - start_time).seconds}秒")
                 print(f"有效评论数: {len(fast_comments)}")
                 self._status("done")
+                
+                # 关闭数据库连接
+                if self.db_connector.connection:
+                    self.db_connector.close()
                 return
 
             # 1. 导航到评论页面
@@ -727,7 +859,7 @@ class TaobaoCommentCrawler:
             
             # 4. 保存结果
             if comments:
-                self.save_to_excel(comments)
+                self.save_to_excel_and_db(comments)
                 
                 print(f"\n[DONE] 爬取完成!")
                 print(f"总耗时: {(datetime.now() - start_time).seconds}秒")
@@ -741,6 +873,14 @@ class TaobaoCommentCrawler:
                 usernames = [c['用户名'] for c in comments]
                 unique_users = len(set(usernames))
                 print(f"- 独立用户数: {unique_users}")
+                
+                # 数据库统计
+                if self.db_connector.connection:
+                    print(f"\n[DB] 数据已保存到数据库:")
+                    print(f"- raw_reviews: {len(comments)} 条原始评论")
+                    if self.enable_analysis:
+                        print(f"- processed_reviews: {len(comments)} 条处理后评论")
+                        print(f"- analysis_results: 已保存分析结果")
             
             else:
                 print("\n[ERROR] 未能提取到任何评论")
@@ -766,6 +906,10 @@ class TaobaoCommentCrawler:
                 print("\n浏览器已关闭")
             except:
                 pass
+            
+            # 关闭数据库连接
+            if self.db_connector.connection:
+                self.db_connector.close()
         
         self._status("done")
         print(f"\n结束时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -773,15 +917,27 @@ class TaobaoCommentCrawler:
 
 # 主程序
 if __name__ == "__main__":
-    # 默认示例商品链接，可按需要替换成你要分析的链接
+    # 数据库配置（根据你的MySQL设置修改）
+    DB_CONFIG = {
+        'host': 'localhost',
+        'port': 3306,
+        'user': 'root',           # 你的MySQL用户名
+        'password': '123456',     # 你的MySQL密码（修改为你自己的密码）
+        'database': 'taobao_comments'  # 你的数据库名
+    }
+    
+    # 默认示例商品链接
     target_url = 'https://item.taobao.com/item.htm?id=903871222461'
     out_dir = default_output_dir()
 
     print("=" * 80)
-    print("淘宝评论爬虫 - 简洁版")
+    print("淘宝评论爬虫 - MySQL数据库版")
     print("=" * 80)
     print(f"目标URL: {target_url[:80]}...")
     print(f"数据保存到: {out_dir / '淘宝评论.xlsx'}")
+    print(f"数据库配置: {DB_CONFIG['host']}:{DB_CONFIG['port']}")
+    print(f"数据库名: {DB_CONFIG['database']}")
+    print(f"数据表: raw_reviews, processed_reviews, analysis_results")
     print("=" * 80)
     print("淘宝评论爬虫启动...")
 
@@ -790,5 +946,8 @@ if __name__ == "__main__":
         output_dir=out_dir,
         max_comments=30,
         keep_login_profile_dir=out_dir / "edge_profile",
+        db_config=DB_CONFIG,  # 传入数据库配置
+        enable_analysis=True,  # 启用分析功能
+        enable_mbert_viz=False  # 可选：启用mBERT可视化
     )
     crawler.run()
