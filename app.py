@@ -140,17 +140,68 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 创建静态目录并挂载静态文件
 static_dir = Path(__file__).parent / "static"
+static_dir.mkdir(exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
-# 启动时恢复历史任务，避免 reload 后前端“啥也没有”
+# 启动时恢复历史任务，避免 reload 后前端"啥也没有"
 _load_jobs_from_disk()
 
 
-@app.get("/", response_class=HTMLResponse)
-def index():
-    html = (static_dir / "index.html").read_text(encoding="utf-8")
-    return HTMLResponse(html)
+@app.get("/")
+async def read_index():
+    """返回前端页面"""
+    html_path = static_dir / "index.html"
+    if html_path.exists():
+        html_content = html_path.read_text(encoding="utf-8")
+        return HTMLResponse(content=html_content, status_code=200)
+    else:
+        # 如果 index.html 不存在，返回一个简单页面
+        html_content = """
+        <!DOCTYPE html>
+        <html lang="zh-CN">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>淘宝评论爬虫</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background: #0b1220;
+                    color: white;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    margin: 0;
+                }
+                .container {
+                    text-align: center;
+                    padding: 40px;
+                    background: rgba(255,255,255,0.06);
+                    border-radius: 12px;
+                    border: 1px solid rgba(255,255,255,0.12);
+                }
+                h1 {
+                    color: #4f8cff;
+                }
+                p {
+                    color: rgba(255,255,255,0.7);
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>淘宝评论爬虫</h1>
+                <p>后端服务器已启动，但前端文件未找到。</p>
+                <p>请确保已将 index.html 和 app.js 文件放入 static 目录中。</p>
+            </div>
+        </body>
+        </html>
+        """
+        return HTMLResponse(content=html_content, status_code=200)
+
 
 @app.get("/api/ping")
 def ping():
@@ -170,6 +221,15 @@ def _run_job(job_id: str):
         _save_job_meta(job)
 
     try:
+        # 数据库配置 - 根据你的MySQL设置修改
+        db_config = {
+            'host': 'localhost',
+            'port': 3306,
+            'user': 'root',
+            'password': '',  # 修改为你的密码
+            'database': 'taobao_comments'
+        }
+        
         crawler = TaobaoCommentCrawler(
             target_url=str(job.url),
             output_dir=job_dir,
@@ -177,6 +237,7 @@ def _run_job(job_id: str):
             status_callback=on_status,
             keep_login_profile_dir=job.output_dir / "edge_profile",
             enable_mbert_viz=job.mbert_vis_path is not None,
+            db_config=db_config  # 添加数据库配置
         )
         crawler.run()
         job.excel_path = crawler.excel_path
@@ -264,7 +325,7 @@ def build_summary_from_csv(csv_path: Path) -> dict:
         vc = df["情感倾向"].fillna("").astype(str).value_counts()
         sentiment_counts = {k: int(v) for k, v in vc.items() if k}
 
-    # 关键词统计（把每条评论的“关键词”按空格拆分）
+    # 关键词统计（把每条评论的"关键词"按空格拆分）
     top_keywords = []
     if "关键词" in df.columns:
         tokens = []
@@ -341,4 +402,30 @@ def download_mbert(job_id: str):
     if not job or not job.mbert_vis_path or not job.mbert_vis_path.exists():
         raise HTTPException(status_code=404, detail="mbert json not found")
     return FileResponse(path=str(job.mbert_vis_path), filename=job.mbert_vis_path.name)
+
+
+# 创建静态文件（如果不存在）
+def create_static_files():
+    """创建静态目录和前端文件"""
+    # 确保静态目录存在
+    static_dir.mkdir(exist_ok=True)
+    
+
+    index_path = static_dir / "index.html"
+    if not index_path.exists():
+        pass
+    
+
+    js_path = static_dir / "app.js"
+    if not js_path.exists():
+        pass
+
+
+# 启动时创建静态文件
+create_static_files()
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+
 
