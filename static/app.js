@@ -75,6 +75,7 @@ function renderSummary(result) {
     <div style="margin-top:6px;">高频关键词：${kwLine}</div>
     <div style="margin-top:6px;">属性关键词：${attrLine}</div>
     <div style="margin-top:6px;">主题分布：${topicLine}</div>
+    <div style="margin-top:6px; color: #4f8cff; font-size: 12px;">💾 数据已自动保存到数据库</div>
   `;
 
   // 如果 Plotly 可用：绘制三张柱状图（情感/属性/主题）
@@ -160,37 +161,52 @@ function renderDownloads(job) {
   if (job.has_xlsx) {
     const a = document.createElement("a");
     a.href = `/api/jobs/${job.job_id}/download/xlsx`;
-    a.textContent = "下载 Excel（xlsx）";
+    a.textContent = "📥 下载 Excel（xlsx）";
+    a.style = "display:block; padding:10px 12px; margin-top:8px; border-radius:10px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.06); color:#bcd3ff; text-decoration:none;";
     box.appendChild(a);
   }
   if (job.has_csv) {
     const a = document.createElement("a");
     a.href = `/api/jobs/${job.job_id}/download/csv`;
-    a.textContent = "下载 CSV";
+    a.textContent = "📥 下载 CSV";
+    a.style = "display:block; padding:10px 12px; margin-top:8px; border-radius:10px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.06); color:#bcd3ff; text-decoration:none;";
     box.appendChild(a);
   }
   if (job.has_mbert) {
     const a = document.createElement("a");
     a.href = `/api/jobs/${job.job_id}/download/mbert`;
-    a.textContent = "下载 mBERT 可视化数据（json）";
+    a.textContent = "📥 下载 mBERT 可视化数据（json）";
+    a.style = "display:block; padding:10px 12px; margin-top:8px; border-radius:10px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.06); color:#bcd3ff; text-decoration:none;";
     box.appendChild(a);
 
     const btn = document.createElement("button");
     btn.className = "btn secondary";
     btn.style.width = "100%";
     btn.style.marginTop = "10px";
-    btn.textContent = "查看散点图（mBERT）";
+    btn.textContent = "🌈 查看散点图（mBERT）";
     btn.addEventListener("click", () => showViz(job.job_id));
     box.appendChild(btn);
   }
+  
+  // 添加数据库状态提示
+  const dbInfo = document.createElement("div");
+  dbInfo.style = "margin-top: 12px; padding: 8px 12px; border-radius: 8px; background: rgba(79, 140, 255, 0.1); border: 1px solid rgba(79, 140, 255, 0.3); color: #bcd3ff; font-size: 12px;";
+  dbInfo.innerHTML = "💾 数据已自动保存到 MySQL 数据库<br><small>表名: raw_reviews, processed_reviews, analysis_results</small>";
+  box.appendChild(dbInfo);
 }
 
 async function checkServer() {
   try {
     const r = await fetch("/api/ping", { method: "GET" });
     $("serverPill").textContent = r.ok ? "在线" : "异常";
+    if (r.ok) {
+      $("serverPill").style.color = "#3ddc97";
+    } else {
+      $("serverPill").style.color = "#ff4f6d";
+    }
   } catch {
     $("serverPill").textContent = "离线";
+    $("serverPill").style.color = "#ff4f6d";
   }
 }
 
@@ -226,7 +242,7 @@ async function pollJob(jobId) {
     const job = await fetchJob(jobId);
     const s = statusLabel(job.status);
     if (job.status === "done") {
-      setStatus(`状态：<span class="ok">${s}</span>`, "ok");
+      setStatus(`状态：<span class="ok">${s}</span><br>💾 数据已保存到数据库`, "ok");
       renderDownloads(job);
       loadResult(jobId);
       stopPolling();
@@ -253,7 +269,7 @@ async function pollJob(jobId) {
       return;
     }
 
-    setStatus(`状态：${s}`);
+    setStatus(`状态：${s}<br>💾 数据将自动保存到数据库`);
   } catch (e) {
     setStatus(`状态获取失败：${e.message}`, "bad");
   }
@@ -340,7 +356,7 @@ async function onStart() {
     try {
       localStorage.setItem("lastJobId", currentJobId);
     } catch {}
-    setStatus(`任务已创建：${currentJobId}<br/>正在运行…`);
+    setStatus(`任务已创建：${currentJobId}<br>正在运行…<br>💾 数据将自动保存到数据库`);
     startPolling(currentJobId);
   } catch (e) {
     setStatus(`创建任务失败：${e.message}`, "bad");
@@ -361,4 +377,5 @@ window.addEventListener("load", () => {
     }
   } catch {}
 });
+
 
